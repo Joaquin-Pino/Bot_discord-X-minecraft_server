@@ -16,6 +16,7 @@ IP_PC = os.getenv("IP_PC")
 DIR_SERVER = os.getenv("DIR_SERVER")
 SCRIPT = os.getenv("SCRIPT_INICIO")
 IP_SERVER = os.getenv("IP_SERVER")
+MOD_PACK = os.getenv("MOD_PACK")
 NOMBRE_ROL = "Rata"
 
 handler = logging.FileHandler(filename='discord.log', encoding='utf-8', mode='w')
@@ -105,7 +106,14 @@ async def apagar_server(ctx):
 @bot.command()
 @commands.has_role(NOMBRE_ROL)
 async def ip(ctx):
-    await ctx.send(IP_SERVER)
+    await ctx.send(f"la ip es: {IP_SERVER}")
+    await ctx.send("recuerda que la version de mine es 1.20.1")
+
+@bot.command()
+@commands.has_role(NOMBRE_ROL)
+async def mods(ctx):
+    await ctx.send("recuerda instalar forge primero (para mine 1.20.1)")
+    await ctx.send(f"{MOD_PACK}")
 
 @bot.command()
 async def hola(ctx):
