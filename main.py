@@ -105,7 +105,7 @@ async def apagar_server(ctx):
 @bot.command()
 @commands.has_role(NOMBRE_ROL)
 async def ip(ctx):
-    ctx.send(IP_SERVER)
+    await ctx.send(IP_SERVER)
 
 @bot.command()
 async def hola(ctx):
