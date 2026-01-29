@@ -60,3 +60,18 @@ async def pc_esta_encendido(ip:str)->bool:
 
     # Si el código es 0, el PC está vivo
     return proceso.returncode == 0
+
+async def esperar_puerto_cerrado(ip, puerto=25565, timeout_total=60) -> bool:
+    """Espera a que el puerto deje de responder (Server apagado)"""
+    intentos = 0
+    while intentos < timeout_total:
+        try:
+            abierto = await asyncio.to_thread(check_puerto, ip, puerto, 1)
+            if not abierto:
+                return True # cerrado
+        except:
+            return True
+
+        await asyncio.sleep(1)
+        intentos += 1
+    return False

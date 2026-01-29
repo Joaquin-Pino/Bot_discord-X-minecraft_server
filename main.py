@@ -3,7 +3,8 @@ from discord.ext import commands
 import logging
 import dotenv
 import os
-from utils.shh_minecraft import intentar_iniciar_async
+from utils.shh_minecraft import intentar_iniciar_async, intentar_apagar_async
+
 dotenv.load_dotenv()
 from utils import *
 
@@ -14,7 +15,7 @@ USER = os.getenv("SSH_USER")
 IP_PC = os.getenv("IP_PC")
 DIR_SERVER = os.getenv("DIR_SERVER")
 SCRIPT = os.getenv("SCRIPT_INICIO")
-
+IP_SERVER = os.getenv("IP_SERVER")
 NOMBRE_ROL = "Rata"
 
 handler = logging.FileHandler(filename='discord.log', encoding='utf-8', mode='w')
@@ -71,11 +72,40 @@ async def iniciar_minecraft(ctx):
         await msg.edit(content="El script corrió, pero el puerto no abre tras 60s. ¿Crash del server?")
 
 
-# @bot.command()
-# @commands.has_role(NOMBRE_ROL)
-# async def apagar_server(ctx):
-#     ...
+@bot.command()
+@commands.has_role(NOMBRE_ROL)
+async def apagar_server(ctx):
+    if not check_puerto(IP_PC, 25565, timeout=1):
+        await ctx.send("El servidor ya parece estar apagado")
+        return
 
+    msg = await ctx.send("Enviando orden de apagado seguro...")
+
+    estado = await intentar_apagar_async(IP_PC, USER)
+
+    if estado == "NO_EXISTE":
+        await msg.edit(content="No encontré la sesión 'mc_server'. ¿Quizás se cerró mal?")
+        return
+
+    if estado == "ERROR":
+        await msg.edit(content="Error de conexión SSH. No pude enviar el comando.")
+        return
+
+    # 3. Si se envió bien, esperamos a que Minecraft guarde y cierre
+    await msg.edit(content="Guardando mundo y deteniendo procesos... (Esto toma unos segundos)")
+
+    se_cerro = await esperar_puerto_cerrado(IP_PC, 25565)
+
+    if se_cerro:
+        await msg.edit(content="**Servidor Apagado correctamente.**")
+    else:
+        await msg.edit(content="Envié el comando 'stop', pero el puerto sigue abierto tras 60s. ¿Se pegó el server?")
+        await msg.send("intenta apagar el server usando /stop (en el juego)")
+
+@bot.command()
+@commands.has_role(NOMBRE_ROL)
+async def ip(ctx):
+    ctx.send(IP_SERVER)
 
 @bot.command()
 async def hola(ctx):
