@@ -218,8 +218,11 @@ async def on_command_error(ctx, error):
     if isinstance(error, commands.CommandNotFound):
         comando_intentado = ctx.invoked_with
 
-        nombres_comandos = [cmd.name for cmd in bot.commands]
-        coincidencias = difflib.get_close_matches(comando_intentado, nombres_comandos, n=1, cutoff=0.6)
+        todos_los_nombres = []
+        for cmd in bot.commands:
+            todos_los_nombres.append(cmd.name)
+            todos_los_nombres.extend(cmd.aliases)
+        coincidencias = difflib.get_close_matches(comando_intentado, todos_los_nombres, n=1, cutoff=0.6)
 
         if coincidencias:
             sugerencia = coincidencias[0]
