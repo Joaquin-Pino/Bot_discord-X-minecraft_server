@@ -3,6 +3,7 @@ from discord.ext import commands
 import logging
 import dotenv
 import os
+import difflib
 from utils.shh_minecraft import intentar_iniciar_async, intentar_apagar_async
 
 dotenv.load_dotenv()
@@ -52,7 +53,7 @@ async def encender(ctx):
 
     await iniciar_server(ctx)
 
-@bot.command()
+@bot.command(aliases=["prender_server"])
 @commands.has_role(NOMBRE_ROL)
 async def iniciar_server(ctx):
     msg = await ctx.send("Intentando iniciar el servidor de Minecraft...")
@@ -103,7 +104,7 @@ async def apagar_server(ctx):
         await msg.edit(content="Envié el comando 'stop', pero el puerto sigue abierto tras 60s. ¿Se pegó el server?")
         await msg.send("intenta apagar el server usando /stop (en el juego)")
 
-@bot.command()
+@bot.command(aliases=["pack_mods", "modpack", "mod_pack"])
 @commands.has_role(NOMBRE_ROL)
 async def ip(ctx):
     await ctx.send(f"la ip es: {IP_SERVER}")
@@ -215,7 +216,16 @@ async def remover_rol(ctx, usr:discord.Member):
 @bot.event
 async def on_command_error(ctx, error):
     if isinstance(error, commands.CommandNotFound):
-        await ctx.send("Ese comando no existe. Usa `!ayuda` para ver la lista.")
+        comando_intentado = ctx.invoked_with
+
+        nombres_comandos = [cmd.name for cmd in bot.commands]
+        coincidencias = difflib.get_close_matches(comando_intentado, nombres_comandos, n=1, cutoff=0.6)
+
+        if coincidencias:
+            sugerencia = coincidencias[0]
+            await ctx.send(f"Ese comando no existe. ¿Quisiste decir `!{sugerencia}`?")
+        else:
+            await ctx.send("Ese comando no existe y no encontré nada parecido. Usa `!ayuda`.")
     elif isinstance(error, commands.MissingRole):
         await ctx.send(f"No tienes el rol ({NOMBRE_ROL}) para usar este comando.")
     elif isinstance(error, commands.MissingPermissions):
