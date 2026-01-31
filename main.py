@@ -50,11 +50,11 @@ async def encender(ctx):
         await ctx.send("El PC prendió, pero el SSH no responde tras 60 segundos. webea al admin del server")
         return
 
-    await iniciar_minecraft(ctx)
+    await iniciar_server(ctx)
 
 @bot.command()
 @commands.has_role(NOMBRE_ROL)
-async def iniciar_minecraft(ctx):
+async def iniciar_server(ctx):
     msg = await ctx.send("Intentando iniciar el servidor de Minecraft...")
 
     estado = await intentar_iniciar_async(IP_PC, USER, DIR_SERVER, SCRIPT)
@@ -118,6 +118,66 @@ async def mods(ctx):
 @bot.command()
 async def hola(ctx):
     await ctx.send("chupalo")
+
+# @bot.command()
+# async def dinnerbone():
+#     #TODO
+#     ...
+# @bot.command()
+# async def jeb_():
+#     #TODO
+#     ...
+
+@bot.command()
+async def ayuda(ctx):
+    # Creamos el objeto Embed
+    embed = discord.Embed(
+        title="Manual de Supervivencia - Server Minecraft",
+        description="Aquí tienes la lista de comandos disponibles para gestionar el servidor.",
+        color=discord.Color.green()
+    )
+
+    # Sección de Gestión del Servidor (Requieren rol "Rata")
+    embed.add_field(
+        name="Gestión del Server",
+        value=(
+            "`!encender`: Enciende el PC (WoL) e inicia Minecraft.\n"
+            "`!iniciar_server`: Inicia el server si el PC ya está prendido.\n"
+            "`!apagar_server`: Apaga el servidor de forma segura."
+        ),
+        inline=False
+    )
+
+    # Sección de Información
+    embed.add_field(
+        name="Información",
+        value=(
+            "`!ip`: Muestra la dirección IP del servidor.\n"
+            "`!mods`: Link del Modpack e instrucciones de versión."
+        ),
+        inline=False
+    )
+
+    # Sección de Administración (Solo Admins)
+    embed.add_field(
+        name="Administración",
+        value=(
+            "`!asignar_rol @usuario`: Entrega el rol de Rata.\n"
+            "`!remover_rol @usuario`: Quita el rol de Rata."
+        ),
+        inline=False
+    )
+
+    # Sección de Otros/Easter Eggs
+    embed.add_field(
+        name="Otros",
+        value="`!hola`",
+        inline=False
+    )
+
+    embed.set_footer(text=f"Solicitado por {ctx.author.name}", icon_url=ctx.author.display_avatar.url)
+
+    await ctx.send(embed=embed)
 
 @bot.command()
 @commands.has_permissions(administrator=True)
