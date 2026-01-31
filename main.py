@@ -129,7 +129,7 @@ async def hola(ctx):
 #     ...
 
 
-@bot.command(aliases=['help', 'comandos', 'info', 'leprechaun'])
+@bot.command(aliases=['comandos', 'leprechaun'])
 async def ayuda(ctx):
     # Creamos el objeto Embed
     embed = discord.Embed(
