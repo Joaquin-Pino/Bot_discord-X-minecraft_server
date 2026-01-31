@@ -128,7 +128,8 @@ async def hola(ctx):
 #     #TODO
 #     ...
 
-@bot.command()
+
+@bot.command(aliases=['help', 'comandos', 'info', 'leprechaun'])
 async def ayuda(ctx):
     # Creamos el objeto Embed
     embed = discord.Embed(
@@ -160,10 +161,10 @@ async def ayuda(ctx):
 
     # Sección de Administración (Solo Admins)
     embed.add_field(
-        name="Administración",
+        name="Administración (solo admins)",
         value=(
-            "`!asignar_rol @usuario`: Entrega el rol de Rata.\n"
-            "`!remover_rol @usuario`: Quita el rol de Rata."
+            f"`!asignar_rol @usuario`: Entrega el rol de {NOMBRE_ROL}.\n"
+            f"`!remover_rol @usuario`: Quita el rol de {NOMBRE_ROL}"
         ),
         inline=False
     )
@@ -213,10 +214,10 @@ async def remover_rol(ctx, usr:discord.Member):
 
 @bot.event
 async def on_command_error(ctx, error):
-    # Verifica si el error es por falta de un rol específico
-    if isinstance(error, commands.MissingRole):
+    if isinstance(error, commands.CommandNotFound):
+        await ctx.send("Ese comando no existe. Usa `!ayuda` para ver la lista.")
+    elif isinstance(error, commands.MissingRole):
         await ctx.send(f"No tienes el rol ({NOMBRE_ROL}) para usar este comando.")
-    # Verifica si el usuario no tiene permisos generales (ej. administrador)
     elif isinstance(error, commands.MissingPermissions):
         await ctx.send("No tienes permisos suficientes.")
     else:
